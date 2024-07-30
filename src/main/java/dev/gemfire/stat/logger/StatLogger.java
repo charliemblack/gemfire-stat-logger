@@ -9,7 +9,6 @@ import org.apache.geode.distributed.DistributedSystem;
 import org.apache.geode.logging.internal.log4j.api.LogService;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,6 +19,7 @@ public class StatLogger implements Function {
     private static final Logger logger = LogService.getLogger();
     private List<StatsHolder> listOfStats = new CopyOnWriteArrayList<>();
     private Timer timer;
+    private long timerInterval = 1000;
 
     @Override
     public boolean isHA() {
@@ -38,33 +38,45 @@ public class StatLogger implements Function {
 
     @Override
     public void execute(FunctionContext functionContext) {
-        String args = ((String[]) functionContext.getArguments())[0];
 
-        String[] arg = args.split(" ");
-        if ("add".compareToIgnoreCase(arg[0]) == 0) {
-            String[] statsNames = arg[1].split("[.]", 0);
+        String[] args = ((String[]) functionContext.getArguments())[0].split(" ");
+        if ("add".compareToIgnoreCase(args[0]) == 0) {
+            String[] statsNames = args[1].split("[.]", 0);
             addStats(functionContext.getCache().getDistributedSystem(), statsNames[0], statsNames[1]);
-            if (timer == null && !listOfStats.isEmpty()) {
-                timer = new Timer("StatLogger", true);
-                timer.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                        for (StatsHolder curr : listOfStats) {
-                            logger.info(curr.toString());
-                        }
-                    }
-                }, 0, 1000);
-            }
+            ensureTimerRunning();
             functionContext.getResultSender().lastResult("Logging Metric count " + listOfStats.size());
-        } else if ("clear".compareToIgnoreCase(arg[0]) == 0) {
-            if (timer != null) {
-                timer.cancel();
-                timer = null;
-            }
+        } else if ("clear".compareToIgnoreCase(args[0]) == 0) {
+            cancelTimer();
             listOfStats.clear();
             functionContext.getResultSender().lastResult("Cleared list and stopped logging");
+        } else if ("interval".compareToIgnoreCase(args[0]) ==0) {
+            timerInterval = Long.parseLong(args[1]);
+            cancelTimer();
+            ensureTimerRunning();
+            functionContext.getResultSender().lastResult("Timer interval set to " + timerInterval + " ms");
         } else {
             functionContext.getResultSender().lastResult("No operation");
+        }
+    }
+
+    private void cancelTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+    private void ensureTimerRunning() {
+        if (timer == null && !listOfStats.isEmpty()) {
+            timer = new Timer("StatLogger", true);
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    for (StatsHolder curr : listOfStats) {
+                        logger.info(curr.toString());
+                    }
+                }
+            }, 0, timerInterval);
         }
     }
 
