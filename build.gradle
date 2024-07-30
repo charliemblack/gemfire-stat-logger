@@ -1,0 +1,19 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+dependencies {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            credentials {
+                username "$mavenUser"
+                password "$mavenPassword"
+            }
+            url "https://commercial-repo.pivotal.io/data3/gemfire-release-repo/gemfire"
+        }
+    }
+    implementation "com.vmware.gemfire:gemfire-core:10.1.0"
+    implementation "com.vmware.gemfire:gemfire-logging:10.1.0"
+}
+
