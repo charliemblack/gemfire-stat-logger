@@ -57,4 +57,22 @@ server2 | OK     | [No operation]
 
 gfsh>
 ```
+## Example Logging on Each Member  
 
+```
+[info 2024/07/29 20:06:50.266 PDT server1 <StatLogger> tid=0x164] DistributionStats.replyWaitsInProgress = 0
+
+[info 2024/07/29 20:06:51.265 PDT server1 <StatLogger> tid=0x164] StatSampler.delayDuration = 999
+
+[info 2024/07/29 20:06:51.265 PDT server1 <StatLogger> tid=0x164] DistributionStats.replyWaitsInProgress = 0
+
+[info 2024/07/29 20:06:52.268 PDT server1 <StatLogger> tid=0x164] StatSampler.delayDuration = 1013
+
+[info 2024/07/29 20:06:52.268 PDT server1 <StatLogger> tid=0x164] DistributionStats.replyWaitsInProgress = 0
+
+[info 2024/07/29 20:06:53.264 PDT server1 <StatLogger> tid=0x164] StatSampler.delayDuration = 1001
+
+[info 2024/07/29 20:06:53.264 PDT server1 <StatLogger> tid=0x164] DistributionStats.replyWaitsInProgress = 0
+
+[info 2024/07/29 20:06:54.279 PDT server1 <StatLogger> tid=0x164] StatSampler.delayDuration = 1011
+```
