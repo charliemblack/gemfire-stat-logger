@@ -2,6 +2,9 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 version = '0.1.0'
+// Set Java compatibility to JDK 8
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 dependencies {
     repositories {
